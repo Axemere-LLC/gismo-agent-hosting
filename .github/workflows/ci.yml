@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.12.5"
+      - run: tofu fmt -check -recursive
+
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir:
+          - modules/gcp-cloud-run
+          - modules/gcp-bootstrap
+          - modules/gcp-artifact-registry
+          - modules/gcp-org-policy
+          - modules/gcp-cicd
+          - examples/minimal
+          - examples/greenfield
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.12.5"
+      - name: init (no backend, no credentials needed)
+        working-directory: ${{ matrix.dir }}
+        run: tofu init -backend=false
+      - name: validate
+        working-directory: ${{ matrix.dir }}
+        run: tofu validate
+
+  confidentiality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: no Axemere mentions beyond the repo-hosting org name
+        run: |
+          # Only "Axemere-LLC" (the literal GitHub org in source/URL strings) is
+          # permitted anywhere in this public repo. Anything else — prose
+          # mentioning "Axemere" as a company, sponsor, or design precedent —
+          # is a confidentiality leak and fails the build.
+          if grep -rin "axemere" --include="*.md" --include="*.tf" . \
+              | grep -v "Axemere-LLC" ; then
+            echo "::error::found an 'Axemere' mention that isn't the Axemere-LLC org name"
+            exit 1
+          fi
