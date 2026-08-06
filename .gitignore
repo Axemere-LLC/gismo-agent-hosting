@@ -1,0 +1,12 @@
+# OpenTofu/Terraform working state — never committed. Consumers get their
+# own on `tofu init`; this repo's CI runs -backend=false and never applies.
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+
+# Editor/OS cruft
+.DS_Store
