@@ -18,6 +18,21 @@ module "org_policy_exception" {
 }
 ```
 
+Also set these on your `provider "google"` block. The Org Policy v2 API refuses to infer a quota
+project from Application Default Credentials the way Cloud Run, Artifact Registry, and IAM do — without
+this, `google_org_policy_policy` fails with a `SERVICE_DISABLED` error against an unrelated
+Google-internal placeholder project, even with `orgpolicy.googleapis.com` enabled on your own project:
+
+```hcl
+provider "google" {
+  project = var.project_id
+  region  = var.region
+
+  user_project_override = true
+  billing_project        = var.project_id
+}
+```
+
 Alternative to applying this module: set `public_invoker = false` on `modules/gcp-cloud-run` and grant
 `roles/run.invoker` to specific identities yourself outside this repo — trades the "any referee can
 reach it" simplicity for narrower access.
