@@ -17,3 +17,7 @@ output "ci_workload_identity_provider" {
 output "endpoint_url" {
   value = try(module.agent[0].endpoint_url, null)
 }
+
+output "agent_service_account_email" {
+  value = try(module.agent[0].service_account_email, null)
+}

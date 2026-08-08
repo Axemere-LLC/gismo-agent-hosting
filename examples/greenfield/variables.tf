@@ -49,3 +49,9 @@ variable "image" {
   type        = string
   default     = null
 }
+
+variable "outbound_key_secret_id" {
+  description = "Secret Manager secret ID holding the bearer key your agent checks incoming requests against. Optional — omit to run unauthenticated (fine for a Training Grounds agent with no data to protect)."
+  type        = string
+  default     = null
+}

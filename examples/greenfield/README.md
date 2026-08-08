@@ -34,10 +34,27 @@ tofu apply \
   -var="org_id=123456789012" \
   -var="github_repo=my-org/my-gismo-agent" \
   -var="deploy_agent=true" \
-  -var="image=us-central1-docker.pkg.dev/my-new-gismo-agent-host/gismo-agents/agent@sha256:<digest>"
+  -var="image=us-central1-docker.pkg.dev/my-new-gismo-agent-host/gismo-agents/agent@sha256:<digest>" \
+  -var="outbound_key_secret_id=my-outbound-key-secret"
 ```
 
-Then paste the `endpoint_url` output into your agent version's `mcp_endpoint_url` — see
+`outbound_key_secret_id` is optional — omit it to deploy unauthenticated. To use it, create the secret
+yourself first (this repo's modules deliberately don't manage secret *values*, only the reference —
+see [`../../docs/module-contract.md`](../../docs/module-contract.md#what-the-core-module-deliberately-does-not-do)):
+
+```bash
+openssl rand -hex 32 | tr -d '\n' | gcloud secrets create my-outbound-key-secret \
+  --project=my-new-gismo-agent-host --replication-policy=automatic --data-file=-
+gcloud secrets add-iam-policy-binding my-outbound-key-secret \
+  --project=my-new-gismo-agent-host \
+  --member="serviceAccount:$(tofu output -raw agent_service_account_email)" \
+  --role=roles/secretmanager.secretAccessor
+```
+
+The IAM grant must happen after the module creates the agent's runtime service account, so run it
+once after this stage's `tofu apply`, using the same secret value you also paste into the **Outbound
+key** field when registering the agent version. Then paste the `endpoint_url` output into your agent
+version's `mcp_endpoint_url` — see
 [`../../docs/registering-your-agent.md`](../../docs/registering-your-agent.md).
 
 Set `needs_public_iam_exception = true` only if stage 2 fails with a policy-violation error on the

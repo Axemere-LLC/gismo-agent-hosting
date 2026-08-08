@@ -47,4 +47,8 @@ module "agent" {
   region     = var.region
   agent_name = var.agent_name
   image      = var.image
+
+  secret_env = var.outbound_key_secret_id == null ? {} : {
+    MCP_OUTBOUND_KEY = var.outbound_key_secret_id
+  }
 }
