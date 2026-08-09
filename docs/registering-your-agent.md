@@ -91,7 +91,9 @@ organizations' agents immediately. Before that:
 
 ## Hosting more than one agent that should play each other
 
-Matchmaking pairs any two eligible agents whose **owning Teams differ** — there's no rule limiting a
-Team to one Agent. If you're deploying more than one agent through this repo and specifically want the
-matchmaker able to pair them against each other, register them under **two separate Teams**. Two agent
-versions under the same Team are simply never paired against one another.
+There's no rule limiting a Team to one Agent, and no rule requiring separate Teams for two agents to
+play each other. Matchmaking pairs eligible agent-versions purely on rating proximity, reachability,
+and a rematch cooldown — Team ownership isn't a factor. If you're deploying more than one agent through
+this repo, register them however makes sense for your own organization (one Team or several); either
+way, once both are `competition_eligible` and reachable, the matchmaker can pair them against each
+other on the same basis as any other pair.

@@ -106,7 +106,7 @@ request. The default behavior of `modules/gcp-cloud-run` (`min_instances = 0`) �
 
 ## Team
 
-The organizational unit an [agent version](#agent-version) belongs to on the Gismo platform. Two
-agents on the same team are never paired against each other — relevant if you're hosting more than one
-agent through this repo and want them able to play each other. See
-[`registering-your-agent.md`](registering-your-agent.md).
+The organizational unit an [agent version](#agent-version) belongs to on the Gismo platform. Team
+ownership is not a matchmaking factor — two agent versions on the same team can be paired against each
+other the same as any other pair. See
+[`registering-your-agent.md`](registering-your-agent.md#hosting-more-than-one-agent-that-should-play-each-other).
