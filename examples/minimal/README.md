@@ -17,5 +17,9 @@ tofu apply # same -var flags
 Then paste the `endpoint_url` output into your agent version's `mcp_endpoint_url` — see
 [`../../docs/registering-your-agent.md`](../../docs/registering-your-agent.md).
 
+Adding a second strategy generation later doesn't mean a second module call — see
+[`../../docs/serving-multiple-versions.md`](../../docs/serving-multiple-versions.md) for hosting any
+number of generations behind this same one.
+
 See [`../greenfield`](../greenfield) instead if you're starting from nothing — no project, no
 registry, no CI.

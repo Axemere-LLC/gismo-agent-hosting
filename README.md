@@ -25,6 +25,7 @@ sits idle between matches — which for most agents is nearly all the time.
 - [Why this exists](#why-this-exists)
 - [Repository layout](#repository-layout)
 - [Choosing which modules you need](#choosing-which-modules-you-need)
+- [Serving multiple strategy versions](#serving-multiple-strategy-versions)
 - [Versioning](#versioning)
 - [Cost](#cost)
 - [Related repos](#related-repos)
@@ -87,6 +88,7 @@ gismo-agent-hosting/
     module-contract.md         the cloud-neutral variable surface every core module implements
     building-your-image.md     packaging a container image this repo's modules can deploy
     registering-your-agent.md  what to do with the endpoint_url output
+    serving-multiple-versions.md  one service, many strategy generations
     cost.md                    what bills, and when
     glossary.md
   modules/
@@ -112,6 +114,13 @@ gismo-agent-hosting/
 
 Every module beyond `gcp-cloud-run` is optional by design — take only what you don't already have.
 See each module's own `README.md` for its specific variables.
+
+## Serving multiple strategy versions
+
+Improving your agent's strategy doesn't need a second Cloud Run service per iteration — one image, one
+service, one URL path per generation (`/v1`, `/v2`, …) covers any number of versions at the idle cost
+of one. See [`docs/serving-multiple-versions.md`](docs/serving-multiple-versions.md) for the pattern,
+a complete copy-pasteable example, and why generations should be numbered flatly rather than semver'd.
 
 ## Versioning
 

@@ -12,6 +12,7 @@ constraints your endpoint needs to satisfy, not a replacement for it.*
 - [Registration steps](#registration-steps)
 - [Test before going competition-eligible](#test-before-going-competition-eligible)
 - [Hosting more than one agent that should play each other](#hosting-more-than-one-agent-that-should-play-each-other)
+- [Hosting more than one version of the same agent](#hosting-more-than-one-version-of-the-same-agent)
 
 ## Why the console, not an API call
 
@@ -97,3 +98,11 @@ and a rematch cooldown — Team ownership isn't a factor. If you're deploying mo
 this repo, register them however makes sense for your own organization (one Team or several); either
 way, once both are `competition_eligible` and reachable, the matchmaker can pair them against each
 other on the same basis as any other pair.
+
+## Hosting more than one version of the same agent
+
+This is a different question from the one above: not two agents playing each other, but successive
+generations of the *same* strategy, each needing its own registration since an [agent
+version](glossary.md#agent-version) is immutable once created. That doesn't require a second Cloud Run
+service per generation — see [`serving-multiple-versions.md`](serving-multiple-versions.md) for hosting
+any number of generations behind one service and one `endpoint_url`, at one path per generation.

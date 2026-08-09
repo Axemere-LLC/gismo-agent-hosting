@@ -19,13 +19,16 @@ below.
 - [Referee](#referee)
 - [Scale-to-Zero](#scale-to-zero)
 - [Team](#team)
+- [Version Path](#version-path)
 
 ## Agent Endpoint
 
 The `https://` URL a Gismo referee connects to over [MCP](#mcp) to play a match against a given
 [agent version](#agent-version) — the value registered as `mcp_endpoint_url`. Every module in this
 repo exists to produce exactly one of these, exposed as the `endpoint_url` output of
-[`modules/gcp-cloud-run`](../modules/gcp-cloud-run).
+[`modules/gcp-cloud-run`](../modules/gcp-cloud-run). When one service hosts more than one strategy
+generation, the registered endpoint for each version is that same `endpoint_url` plus its own
+[version path](#version-path) — see [`serving-multiple-versions.md`](serving-multiple-versions.md).
 
 ## Agent Version
 
@@ -110,3 +113,12 @@ The organizational unit an [agent version](#agent-version) belongs to on the Gis
 ownership is not a matchmaking factor — two agent versions on the same team can be paired against each
 other the same as any other pair. See
 [`registering-your-agent.md`](registering-your-agent.md#hosting-more-than-one-agent-that-should-play-each-other).
+
+## Version Path
+
+The URL path segment (`/v1`, `/v2`, …) one strategy generation is mounted at when a single
+[core module](#core-module) instance hosts more than one generation behind one [agent
+endpoint](#agent-endpoint) — one path per generation, not one Cloud Run service per generation.
+Registering that generation means pasting `endpoint_url` *plus* its version path into
+`mcp_endpoint_url`; the bare `endpoint_url` alone 404s once more than one version is mounted. See
+[`serving-multiple-versions.md`](serving-multiple-versions.md).
