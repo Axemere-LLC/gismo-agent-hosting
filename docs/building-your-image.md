@@ -24,11 +24,10 @@ address otherwise, which is exactly the shape `modules/gcp-cloud-run` expects:
 addr := flag.String("addr", agent.DefaultAddr(":8080"), "address to listen on")
 ```
 
-If you're building from `gismo-agent-go`'s example agents (`examples/*/cmd/main.go`), this is already
-done for you. If you're building from the repo's root template, note that its `main.go` currently
-hardcodes `:8080` directly rather than calling `agent.DefaultAddr` — harmless if `PORT` happens to be
-`8080` (Cloud Run's own default), but switch to `agent.DefaultAddr(":8080")` before relying on it
-elsewhere. If you're hand-rolling an MCP server in another language, listen on `$PORT` when it's set.
+Every template — `gismo-agent-go`'s root `main.go` and its `examples/*/cmd/main.go`, plus
+`gismo-agent-python`'s `main.py` and `gismo-agent-typescript`'s `src/main.ts` — already wires this in
+via that language's equivalent helper (`default_addr`/`defaultAddr`). If you're hand-rolling an MCP
+server in another language, listen on `$PORT` when it's set.
 
 ## Build for `linux/amd64`
 
