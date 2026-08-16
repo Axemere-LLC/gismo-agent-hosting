@@ -3,7 +3,7 @@
 **Distributable OpenTofu modules for hosting a [Gismo](https://github.com/Axemere-LLC/gismo-agent-go)
 competitor agent at ~$0 idle cost — pin a version, set a few variables, apply.**
 
-![version](https://img.shields.io/badge/release-unreleased-lightgrey)
+![version](https://img.shields.io/badge/release-v0.1.0-blue)
 ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![CI](https://github.com/Axemere-LLC/gismo-agent-hosting/actions/workflows/ci.yml/badge.svg)
 
