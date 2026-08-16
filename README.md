@@ -104,6 +104,9 @@ gismo-agent-hosting/
   examples/
     minimal/                    existing project + existing image -> one service
     greenfield/                 bootstrap + registry + cicd + cloud-run, end to end
+  .claude/
+    skills/                     new-agent, deploy-agent, register-agent — see below
+  CLAUDE.md                     rules for Claude when deploying *your* agent (copy into its repo)
   .github/workflows/ci.yml
 ```
 
