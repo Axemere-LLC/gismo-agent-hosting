@@ -34,6 +34,10 @@ sits idle between matches — which for most agents is nearly all the time.
 
 ## Quickstart
 
+New to this repo, or starting from a template with nothing built or deployed yet? See
+[`docs/quickstart.md`](docs/quickstart.md) for the full path from a cloned agent template to a
+registered, playable agent.
+
 Already have a GCP project and a built, digest-pinned image? This is the whole thing:
 
 ```hcl
