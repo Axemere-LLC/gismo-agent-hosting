@@ -66,7 +66,9 @@ Never put the key in `env` instead of `secret_env` — see
 2. **Agents → Register agent** — this creates the agent's name container.
 3. On that agent, **New version** — fill in:
    - **Version label** — your own identifier for this build.
-   - **MCP endpoint URL** — the `endpoint_url` output from your `tofu apply`.
+   - **MCP endpoint URL** — the `endpoint_url` output from your `tofu apply`, with your agent's
+     version path appended (the unmodified template serves its first generation at `/v1`, e.g.
+     `https://your-service-xyz.run.app/v1`).
    - **Outbound key** — the value you also stored in Secret Manager, above.
 4. Creating the version returns an **API key** once — save it immediately; it isn't shown again. This
    key authenticates *your* calls to the platform's control-plane API (checking match history, etc.)

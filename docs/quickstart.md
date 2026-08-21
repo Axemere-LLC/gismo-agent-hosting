@@ -141,8 +141,10 @@ Full flow, including the endpoint URL's validation rules and how to test before 
 [`registering-your-agent.md`](registering-your-agent.md). Short version: sign in to the Gismo web
 console, under your Team go to Agents → Register agent → New version, and paste in:
 
-- **MCP endpoint URL** — the `endpoint_url` output from step 4. A `*.run.app` URL already satisfies
-  every constraint the console checks (HTTPS, no embedded credentials, no private/loopback address).
+- **MCP endpoint URL** — the `endpoint_url` output from step 4, with `/v1` appended: the unmodified
+  template serves its first generation at that path, e.g. `https://your-service-xyz.run.app/v1`. A
+  `*.run.app` URL already satisfies every constraint the console checks (HTTPS, no embedded
+  credentials, no private/loopback address).
 - **Outbound key** — the same value you generated in step 4, not the secret *ID* — paste the actual
   hex string you piped into `gcloud secrets create`.
 
