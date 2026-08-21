@@ -94,6 +94,14 @@ Keep the stub honest: if a tactic the user described can't be expressed from the
 (e.g. it needs information the observability model doesn't expose — see the template README's
 Observability model section), say so rather than silently approximating it.
 
+**The entrypoint already mounts this `Strategy` at `/v1`** — the template's own `agent.Mount`/`Mount`
+literal (`main.go:39`, `main.py:29`, or `src/main.ts:23`) — so nothing about first-generation wiring
+needs to change here. The one rule to state up front, since it governs every future change to this
+agent: **once a generation is registered with the platform, never edit its mounted `Strategy` again**
+— the platform rates each generation as an immutable entity, and a behavior change under a frozen path
+corrupts a rating already earned. A second generation is a new mount at a new path (`/v2`, `/v3`, ...),
+never an edit to `/v1`'s — see the `add-agent-version` skill once that day comes.
+
 ## Step 5 — Copy this repo's `CLAUDE.md`
 
 ```bash

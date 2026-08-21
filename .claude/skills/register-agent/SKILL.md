@@ -62,8 +62,13 @@ flow):
 1. Sign in to the Gismo web console, select (or create) the **Team** that will own this agent.
 2. **Agents → Register agent** — creates the agent's name container.
 3. On that agent, **New version** and fill in:
-   - **Version label** — their own identifier for this build (e.g. `v1`).
-   - **MCP endpoint URL** — the `endpoint_url` value checked in Step 1.
+   - **Version label** — their own identifier for this build, matching the path segment being
+     registered (e.g. `v1` for `/v1`, `v2` for `/v2`).
+   - **MCP endpoint URL** — the `endpoint_url` value checked in Step 1, **with the generation's path
+     appended**: every template mounts its first generation at `/v1` from day one, so the bare
+     `endpoint_url` alone never serves MCP — e.g. `https://your-service-xyz.run.app/v1`. Registering
+     the unsuffixed URL 401s (if an outbound key is set) or 404s (if not) unconditionally; it is not a
+     valid registration target under any circumstance.
    - **Outbound key** — the raw hex value from Step 0, *not* the Secret Manager secret ID.
 4. Creating the version returns a one-time **API key** — tell the user to save it immediately; it
    authenticates their own calls to the platform's control-plane API and is unrelated to the outbound
@@ -71,10 +76,12 @@ flow):
 5. Leave **competition-eligible** off. Do not tell the user to turn it on yet — that's Step 4 below,
    and only after a clean training match.
 
-If the agent reports a version string via its MCP `initialize` handshake, remind the user it should
-match the **Version label** they just entered — see
-[`docs/registering-your-agent.md`](../../docs/registering-your-agent.md) and each template's README
-section on reporting version (`serve`'s version argument).
+The agent's MCP `initialize` handshake auto-reports the path-derived version label now (it's
+path-derived, not something the template's code has to be told separately) — confirm
+`serverInfo.version` in the handshake equals the **Version label** entered above, rather than
+reminding the user to pass a version argument by hand. See
+[`docs/registering-your-agent.md`](../../docs/registering-your-agent.md) and
+[`docs/serving-multiple-versions.md`](../../docs/serving-multiple-versions.md).
 
 ## Step 3 — Run a training match
 

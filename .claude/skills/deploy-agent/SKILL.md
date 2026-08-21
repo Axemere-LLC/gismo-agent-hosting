@@ -11,7 +11,7 @@ description: >
   stops and says so if asked to target AWS or Azure before those modules
   exist. Never pushes to any git remote and never edits files outside the
   target agent's own working directory.
-argument-hint: "[path-to-agent-directory]"
+argument-hint: "[path-to-agent-directory] [--bump]"
 disable-model-invocation: false
 allowed-tools: Bash Read Grep Write Edit
 ---
@@ -48,6 +48,57 @@ it's the right one.
 
 If `./CLAUDE.md` isn't present in the target directory, copy it from this repo before continuing —
 its rules (digest-pinning, `secret_env`, the apply gate) govern the rest of this skill.
+
+## Step 0.5 — Optional: bump the code version (`--bump`)
+
+**Skipped entirely unless `--bump` was passed to this skill invocation.** This bumps the target
+agent's *code version* — a semver, one per repo, tracking "which build is this." It is a different
+axis from the *agent version*/generation served at `/vN`, which this step never touches; see
+[`docs/serving-multiple-versions.md`](../../docs/serving-multiple-versions.md) if the distinction
+isn't already clear to the user.
+
+Anchor via the most recent tag, same convention as this repo's own `release` skill:
+
+```bash
+git describe --tags --match 'v*' --abbrev=0
+```
+
+If this fails (no tags yet), the next version is `0.1.0` regardless of level chosen — the template's
+`scripts/bump-version.sh` handles this case itself.
+
+Summarize `git log <anchor>..HEAD --oneline` by conventional-commit type and recommend a level using
+the usual rule: any `!` after the type or a `BREAKING CHANGE` footer → `major`; any `feat:` → `minor`;
+otherwise → `patch`. Present the recommendation and **require the user to type back a level word** —
+`major`, `minor`, `patch`, or `skip`. `skip` continues to Step 1 without bumping anything.
+
+```bash
+bash scripts/bump-version.sh <level>
+```
+
+Then read the entrypoint's mount literal (`main.go:39` for Go, `main.py:29` for Python,
+`src/main.ts:23` for TypeScript — see `add-agent-version` for the exact shape) to find every path
+currently served. **Derive this list by reading the file, never by guessing or trusting what the user
+says is deployed.** If the anchor tag exists, also read the entrypoint as of that tag
+(`git show <anchor>:<entrypoint-path>`) and diff its mount list against the current one — any path
+present now but not at the anchor is newly added.
+
+```bash
+git add -A
+git commit -m "chore(release): v<new>"
+git tag -a "v<new>" -m "serves <space-separated current path list>"          # no new mount since <anchor>
+# or, if the diff above found a newly added path:
+git tag -a "v<new>" -m "serves <space-separated current path list> (new: <newly added path(s)>)"
+git push --follow-tags
+```
+
+The annotated tag message is the one place the code-version and agent-version axes get correlated —
+write the real path list every time, not a placeholder. No CI wait is needed here: this skill builds
+the image locally in the next step, it doesn't depend on a release pipeline picking up the push.
+
+**The level word above does not authorize `tofu apply`.** That is an entirely separate gate — Step 6
+below still requires its own literal typed **`apply`**, unweakened and unimplied by anything decided
+in this step. Approving a bump level, or approving the diff this step produces, is not sufficient for
+apply and must never be treated as such.
 
 ## Step 1 — Build and digest-pin the image
 
