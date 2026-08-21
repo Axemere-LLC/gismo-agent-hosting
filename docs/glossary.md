@@ -8,10 +8,13 @@ below.
 - [Agent Endpoint](#agent-endpoint)
 - [Agent Version](#agent-version)
 - [Always-Allocated CPU](#always-allocated-cpu)
+- [Code Version](#code-version)
+- [Cold Start](#cold-start)
 - [Competition-Eligible](#competition-eligible)
 - [Core Module](#core-module)
-- [Cold Start](#cold-start)
 - [Digest-Pinned Image](#digest-pinned-image)
+- [Generation](#generation)
+- [Golden Fixture](#golden-fixture)
 - [MCP](#mcp)
 - [Module Contract](#module-contract)
 - [Optional Module](#optional-module)
@@ -42,6 +45,22 @@ Cloud Run's billing mode where a running instance's CPU is available (and billed
 duration it's up, as opposed to only during active request handling. `modules/gcp-cloud-run` always
 runs in this mode, which is why `cpu` must be `>= 1` — see [`module-contract.md`](module-contract.md).
 
+## Code Version
+
+The semver identifying which build of an agent's source code is running — one per repo, tracked by
+git tags (`v0.2.0`, …), independent of any [agent version](#agent-version)/[generation](#generation) a
+given build happens to serve. Bumped with each template's own `scripts/bump-version.sh`, optionally
+via the `deploy-agent` skill's `--bump` step. See
+[`serving-multiple-versions.md`](serving-multiple-versions.md#number-generations-dont-semver-them) for
+why this is a separate axis from a generation number, never a substitute for one.
+
+## Cold Start
+
+The latency between a request arriving at a [scaled-to-zero](#scale-to-zero) service and the first
+instance becoming ready to serve it. See [`cost.md`](cost.md#why-idle-is-0) for why this repo accepts
+it by default, and [`registering-your-agent.md`](registering-your-agent.md) for how to check it isn't
+causing forfeits.
+
 ## Competition-Eligible
 
 The flag on an [agent version](#agent-version) that puts it into real rated matchmaking against other
@@ -54,19 +73,27 @@ The one module every consumer of this repo uses regardless of what else they nee
 `modules/gcp-cloud-run` today, with `aws-app-runner` and `azure-container-apps` planned to follow the
 same [module contract](#module-contract). Contrast with an [optional module](#optional-module).
 
-## Cold Start
-
-The latency between a request arriving at a [scaled-to-zero](#scale-to-zero) service and the first
-instance becoming ready to serve it. See [`cost.md`](cost.md#why-idle-is-0) for why this repo accepts
-it by default, and [`registering-your-agent.md`](registering-your-agent.md) for how to check it isn't
-causing forfeits.
-
 ## Digest-Pinned Image
 
 A container image reference locked to its content hash (`...@sha256:<64 hex>`) rather than a mutable
 tag (`:latest`, a branch name). `modules/gcp-cloud-run`'s `image` variable requires this — see
 [`module-contract.md`](module-contract.md#what-the-core-module-deliberately-does-not-do) for why, and
 [`building-your-image.md`](building-your-image.md#get-the-digest-not-the-tag) for how to obtain one.
+
+## Generation
+
+An [agent version](#agent-version)'s informal name — "which numbered iteration of this strategy is
+this." Served at its own [version path](#version-path) (`/v1`, `/v2`, …) and rated independently the
+moment it plays its first match; never edited in place once registered. See
+[`serving-multiple-versions.md`](serving-multiple-versions.md).
+
+## Golden Fixture
+
+A recorded expected output (`fixtures/expected/<name>.json`) for running a fixed input corpus
+(`fixtures/scenarios.json`) through a given `Strategy`. Re-running the corpus and diffing against the
+golden is how each template catches a shared helper silently changing an already-registered
+[generation](#generation)'s behavior. See
+[`serving-multiple-versions.md`](serving-multiple-versions.md#the-frozen-version-drift-hazard).
 
 ## MCP
 
@@ -116,9 +143,11 @@ other the same as any other pair. See
 
 ## Version Path
 
-The URL path segment (`/v1`, `/v2`, …) one strategy generation is mounted at when a single
-[core module](#core-module) instance hosts more than one generation behind one [agent
-endpoint](#agent-endpoint) — one path per generation, not one Cloud Run service per generation.
-Registering that generation means pasting `endpoint_url` *plus* its version path into
-`mcp_endpoint_url`; the bare `endpoint_url` alone 404s once more than one version is mounted. See
-[`serving-multiple-versions.md`](serving-multiple-versions.md).
+The URL path segment (`/v1`, `/v2`, …) one [generation](#generation) is mounted at — one path per
+generation, not one Cloud Run service per generation, all served behind the same one [agent
+endpoint](#agent-endpoint). Every template mounts `/v1` from the start, so this applies even to a
+single-generation agent: the bare `endpoint_url` never serves MCP on its own, unconditionally, not
+only once a second version is added. Registering a generation means pasting `endpoint_url` *plus* its
+version path into `mcp_endpoint_url`. Requesting the bare `endpoint_url` gets a 401 (if an
+[outbound key](#outbound-key) is set — the whole router is wrapped in one bearer-auth check) or a 404
+(if not), never MCP. See [`serving-multiple-versions.md`](serving-multiple-versions.md).

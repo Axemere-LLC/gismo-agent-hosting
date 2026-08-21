@@ -69,7 +69,7 @@ instead.
 
 | Output | Notes |
 |---|---|
-| `endpoint_url` | The exact `https://` URL to paste into `mcp_endpoint_url` when [registering your agent](registering-your-agent.md). |
+| `endpoint_url` | The base `https://` URL for your service. Paste it *plus* the generation's [version path](glossary.md#version-path) (`endpoint_url` + `/v1`, `/v2`, …) into `mcp_endpoint_url` when [registering your agent](registering-your-agent.md) — the bare `endpoint_url` alone never serves MCP. |
 | `service_name` | Provider-native resource name, for lookups outside this module (logs, dashboards). |
 | `service_account_email` | The runtime identity the container runs as. Grant it further provider permissions only if your agent needs them — the module grants none beyond what running the container requires. |
 

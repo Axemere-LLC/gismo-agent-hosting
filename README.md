@@ -127,7 +127,8 @@ See each module's own `README.md` for its specific variables.
 Improving your agent's strategy doesn't need a second Cloud Run service per iteration — one image, one
 service, one URL path per generation (`/v1`, `/v2`, …) covers any number of versions at the idle cost
 of one. See [`docs/serving-multiple-versions.md`](docs/serving-multiple-versions.md) for the pattern,
-a complete copy-pasteable example, and why generations should be numbered flatly rather than semver'd.
+the library primitive your template already ships, and why generations should be numbered flatly
+rather than semver'd.
 
 ## Versioning
 

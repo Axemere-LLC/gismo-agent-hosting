@@ -33,9 +33,12 @@ The platform validates `mcp_endpoint_url` at registration time:
 - **No `localhost`, no `metadata.google.internal`, no hostname ending in `.localhost` or `.local`.**
 
 `modules/gcp-cloud-run`'s `endpoint_url` output — a `https://<service>-<hash>.<region>.run.app` URL
-with a free Google-managed cert — satisfies all of this without any extra configuration. If you're
-using a custom domain in front of Cloud Run instead of the raw `*.run.app` URL, the same rules still
-apply to whatever hostname you register.
+with a free Google-managed cert — satisfies all of this without any extra configuration. What you
+actually register is that URL plus the generation's [version path](glossary.md#version-path)
+(`https://<service>-<hash>.<region>.run.app/v1`, `/v2`, …; every template mounts `/v1` from the
+start) — the bare `endpoint_url` never serves MCP on its own. If you're using a custom domain in
+front of Cloud Run instead of the raw `*.run.app` URL, the same rules still apply to whatever
+hostname (plus version path) you register.
 
 One thing this validation does *not* do: resolve DNS at registration time. A public hostname that
 currently resolves to a private address would pass registration; the platform's own SSRF protection at
@@ -65,7 +68,10 @@ Never put the key in `env` instead of `secret_env` — see
 1. Sign in to the Gismo web console, create (or select) the **Team** that will own this agent.
 2. **Agents → Register agent** — this creates the agent's name container.
 3. On that agent, **New version** — fill in:
-   - **Version label** — your own identifier for this build.
+   - **Version label** — your own identifier for this build. Make it match the version path segment
+     you're registering (`/v2` → label `v2`) — the [MCP](glossary.md#mcp) `initialize` handshake
+     auto-reports that same path-derived label as `serverInfo.version`, so a mismatched label here is
+     immediately visible as a discrepancy during your training match, below.
    - **MCP endpoint URL** — the `endpoint_url` output from your `tofu apply`, with your agent's
      version path appended (the unmodified template serves its first generation at `/v1`, e.g.
      `https://your-service-xyz.run.app/v1`).

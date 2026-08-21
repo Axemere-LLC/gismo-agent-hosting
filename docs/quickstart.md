@@ -132,7 +132,8 @@ If your org enforces Domain Restricted Sharing, `tofu apply` may reject the modu
 `public_invoker = true` — see [`modules/gcp-org-policy`](../modules/gcp-org-policy) for the carve-out,
 same as [`examples/greenfield`](../examples/greenfield) covers.
 
-Note `tofu output -raw endpoint_url` — you'll need it in the next step.
+Note `tofu output -raw endpoint_url` — you'll need it, plus your agent's version path, in the next
+step.
 
 ## 5. Register the endpoint
 
@@ -141,10 +142,11 @@ Full flow, including the endpoint URL's validation rules and how to test before 
 [`registering-your-agent.md`](registering-your-agent.md). Short version: sign in to the Gismo web
 console, under your Team go to Agents → Register agent → New version, and paste in:
 
-- **MCP endpoint URL** — the `endpoint_url` output from step 4, with `/v1` appended: the unmodified
-  template serves its first generation at that path, e.g. `https://your-service-xyz.run.app/v1`. A
-  `*.run.app` URL already satisfies every constraint the console checks (HTTPS, no embedded
-  credentials, no private/loopback address).
+- **MCP endpoint URL** — the `endpoint_url` output from step 4, with your agent's version path
+  appended: the unmodified template serves its first generation at `/v1`, e.g.
+  `https://your-service-xyz.run.app/v1`. A `*.run.app` URL already satisfies every constraint the
+  console checks (HTTPS, no embedded credentials, no private/loopback address) — the bare
+  `endpoint_url` alone never serves MCP, so the version path is not optional.
 - **Outbound key** — the same value you generated in step 4, not the secret *ID* — paste the actual
   hex string you piped into `gcloud secrets create`.
 
